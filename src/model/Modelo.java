@@ -73,17 +73,27 @@ public class Modelo {
         this.matriz = matriz;
     }
 
-    public void gerarFNC() {
+    public void gerarFNC(String nomeArquivo) {
         int cor = 4;
+        int clausula=0;
+        int variaveis=0;
+        String inicio="p cnf";
+        ArrayList list = new <String>ArrayList();
+        File file= new File("Instancias");
+        File arquivos[]= file.listFiles();
+        
         try {
-            fileWrite = new FileWriter(new File("Teste.cnf"), true);
+            fileWrite = new FileWriter(new File(nomeArquivo+".cnf"), true);
 
             if (cor == 1) {
                 String fnc = "";
                 for (int i = 1; i <= vertices; i++) {
                     fnc = "" + i + cor + " 0\n";
                     /* System.out.print(fnc);//Escrever no arquivo*/
-                       fileWrite.write(fnc);
+                    variaveis++;
+                    clausula++;
+                    list.add(fnc);
+                   // fileWrite.write(fnc);
            
 
                 }
@@ -94,13 +104,18 @@ public class Modelo {
                         if (this.matriz[i][j] == 1) {
                             fnc = "" + (i * -1) + "1" + " " + (j * -1) + "1" + " 0\n";
                             /*   System.out.print(fnc);//escrever no arquivo*/
-                             fileWrite.write(fnc);
- /*vou ṕegar um vertice colorir 11 e comparar com seus vizinhos -21*/
+                            clausula++;
+                            list.add(fnc);
+                            // fileWrite.write(fnc);
+
                         }
                     }
                 }
-                fileWrite.flush();
-                fileWrite.close();
+                
+                inicio=inicio+" "+variaveis+" "+clausula+"\n"; 
+                list.add(0, inicio);
+               //fileWrite.flush();
+              //  fileWrite.close();
 
             } else if (cor > 1) {
                 String fnc = "";
@@ -109,11 +124,15 @@ public class Modelo {
                     for (int j = 1; j <= cor; j++) {
 
                         fnc = fnc + i + j + " ";
-
+                        variaveis++;
+                      
                     }
-                    fnc=fnc+"0";
+                    fnc=fnc+"0\n";
+                    
                     //System.out.println(fnc);
-                      fileWrite.write(fnc+"\n");
+                    clausula++;
+                    list.add(fnc);
+                      //fileWrite.write(fnc);
                     fnc = "";
                 }
                 fnc = "";
@@ -124,9 +143,11 @@ public class Modelo {
                         fnc = "-" + i + j;
                         for (int k = 1; k <= cor; k++) {
                             if (j != k) {
-                                fnc = fnc + " " + "-" + i + k + " 0";
+                                fnc = fnc + " " + "-" + i + k + " 0\n";
                                 /*System.out.println(fnc);Escrever no arquivo*/
-                                fileWrite.write(fnc+"\n");
+                                clausula++;
+                                list.add(fnc);
+                               // fileWrite.write(fnc+"\n");
                                 
                             }
                             fnc = "";
@@ -147,8 +168,10 @@ public class Modelo {
                                 fnc1 = "-" + i + k;
                                 for (int l = 1; l <= cor; l++) {
                                     if (k == l) {
-                                        fnc1 = fnc1 + " " + "-" + j + l + " 0";
-                                       fileWrite.write(fnc1+"\n");
+                                        fnc1 = fnc1 + " " + "-" + j + l + " 0\n";
+                                        clausula++;
+                                        list.add(fnc1);
+                                     //  fileWrite.write(fnc1+"\n");
                                     }
 
                                 }
@@ -158,10 +181,19 @@ public class Modelo {
                         }
                     }
                 }
-                fileWrite.flush();
-                fileWrite.close();
-
+             
+                inicio=inicio+" "+variaveis+" "+clausula+"\n"; 
+                list.add(0, inicio);
             }
+           
+            
+            for(int i=0; i<list.size(); i++){
+               
+                this.fileWrite.write((String) list.get(i));
+                
+            }
+               this.fileWrite.flush();
+               this.fileWrite.close();
 
         } catch (IOException ex) {
             Logger.getLogger(Modelo.class.getName()).log(Level.SEVERE, null, ex);
