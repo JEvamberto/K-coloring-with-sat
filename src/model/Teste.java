@@ -40,7 +40,7 @@ public class Teste {
         boolean isSatisfativel=false;
         if (es >= 0 && es < arquivos.length) {
             m.GerarMatrizAdjacencia(arquivos[es]);
-
+            long tempoInicio = System.currentTimeMillis();
             for (int i = 1; i <= m.getMaxCor(); i++) {
 
                 m.gerarFNC(arquivos[es], i);
@@ -53,7 +53,7 @@ public class Teste {
                     while ((line = in.readLine()) != null) {
                         if (line.equals("s SATISFIABLE")) {
                             System.out.println("É satisfazível");
-                            //System.out.println(line);
+                            System.out.println(line);
                             isSatisfativel=true;
                         } else {
                             //System.out.println("Não é satisfazível");
@@ -74,8 +74,16 @@ public class Teste {
                 }
 
             }
+            long tempoFim=System.currentTimeMillis()-tempoInicio;
+            
+            double segundos=(double)tempoFim;
             
             System.out.println("Quantidade minima de cores:"+menorCor);
+          //  System.out.println("Tempo:"+segundos);
+             System.out.printf("%.3f ms%n", (tempoFim) / 1000d);
+
+
+
 
         }
 
