@@ -5,29 +5,80 @@
  */
 package model;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author jose
  */
 public class Teste {
-    
-    
+
     public static void main(String[] args) {
         Modelo m = new Modelo();
-        m.GerarMatrizAdjacencia();
-        int count=0;
-        for (int i = 0; i < m.getMatriz().length; i++) {
-            for (int j = 0; j < m.getMatriz().length; j++) {
-                System.out.print(m.getMatriz()[i][j]);
+        File file = new File("Instancias");
+        File arquivos[] = file.listFiles();
+        System.out.println("Escolha o graph:");
+        for (int i = 0; i < arquivos.length; i++) {
+            System.out.println(i + "-" + arquivos[i].getName());
+
+        }
+        int es = 0;
+        String esc = JOptionPane.showInputDialog("Escolha o grafo pelo número ao lado esquerdo!");
+        try {
+            es = Integer.parseInt(esc);
+        } catch (NumberFormatException e) {
+            System.out.println("Número inválido");
+        }
+        Process processo;
+        int menorCor=-1;
+        boolean isSatisfativel=false;
+        if (es >= 0 && es < arquivos.length) {
+            m.GerarMatrizAdjacencia(arquivos[es]);
+
+            for (int i = 1; i <= m.getMaxCor(); i++) {
+
+                m.gerarFNC(arquivos[es], i);
+
+                try {
+                    processo = Runtime.getRuntime().exec("glucose "+arquivos[es].getName()+".cnf");
+                    BufferedReader in = new BufferedReader(new InputStreamReader(processo.getInputStream()));
+
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        if (line.equals("s SATISFIABLE")) {
+                            System.out.println("É satisfazível");
+                            //System.out.println(line);
+                            isSatisfativel=true;
+                        } else {
+                            //System.out.println("Não é satisfazível");
+                           // System.out.println(line);
+                            isSatisfativel=false;
+                        }
+                    }
+                    processo.waitFor();
+                } catch (IOException ex) {
+                    Logger.getLogger(Teste.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Teste.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 
-            
+                if(isSatisfativel){
+                    menorCor=i;
+                    break;
+                }
+
             }
             
-            System.out.println("");
+            System.out.println("Quantidade minima de cores:"+menorCor);
+
         }
-    m.gerarFNC();
+
     }
-    
-    
-    
+
 }

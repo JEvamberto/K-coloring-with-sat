@@ -17,15 +17,17 @@ public class Modelo {
     private FileWriter fileWrite;
     private int[][] matriz;
     private int vertices;
+    private int MaxCor;
+
 
     public Modelo() {
 
     }
 
-    public void GerarMatrizAdjacencia() {
+    public void GerarMatrizAdjacencia(File file) {
 
         try {
-            ler = new FileReader(new File("/home/jose/NetBeansProjects/K-coloring-with-sat/K-coloring-with-sat/myciel3.col"));
+            ler = new FileReader(file);
             BufferedReader lerArq = new BufferedReader(ler);
             String s;
             String[] split;
@@ -73,17 +75,28 @@ public class Modelo {
         this.matriz = matriz;
     }
 
-    public void gerarFNC(String nomeArquivo) {
-        int cor = 4;
-        int clausula=0;
-        int variaveis=0;
-        String inicio="p cnf";
+    public void gerarFNC(File file, int cor) {
+
+        int clausula = 0;
+        int variaveis = 0;
+        String inicio = "p cnf";
         ArrayList list = new <String>ArrayList();
-        File file= new File("Instancias");
-        File arquivos[]= file.listFiles();
+
+        this.GerarMatrizAdjacencia(file);
+        boolean rescrita = true;
         
+       
+
         try {
-            fileWrite = new FileWriter(new File(nomeArquivo+".cnf"), true);
+            if (rescrita) {
+                fileWrite = new FileWriter(new File(file.getName() + ".cnf"));
+                this.fileWrite.flush();
+                this.fileWrite.close();
+                fileWrite = null;
+                rescrita = false;
+
+            }
+            fileWrite = new FileWriter(new File(file.getName() + ".cnf"), true);
 
             if (cor == 1) {
                 String fnc = "";
@@ -93,11 +106,9 @@ public class Modelo {
                     variaveis++;
                     clausula++;
                     list.add(fnc);
-                   // fileWrite.write(fnc);
-           
+                    // fileWrite.write(fnc);
 
                 }
-                       
 
                 for (int i = 0; i < this.matriz.length; i++) {
                     for (int j = 0; j < this.matriz.length; j++) {
@@ -111,11 +122,11 @@ public class Modelo {
                         }
                     }
                 }
-                
-                inicio=inicio+" "+variaveis+" "+clausula+"\n"; 
+
+                inicio = inicio + " " + variaveis + " " + clausula + "\n";
                 list.add(0, inicio);
-               //fileWrite.flush();
-              //  fileWrite.close();
+                //fileWrite.flush();
+                //  fileWrite.close();
 
             } else if (cor > 1) {
                 String fnc = "";
@@ -125,14 +136,14 @@ public class Modelo {
 
                         fnc = fnc + i + j + " ";
                         variaveis++;
-                      
+
                     }
-                    fnc=fnc+"0\n";
-                    
+                    fnc = fnc + "0\n";
+
                     //System.out.println(fnc);
                     clausula++;
                     list.add(fnc);
-                      //fileWrite.write(fnc);
+                    //fileWrite.write(fnc);
                     fnc = "";
                 }
                 fnc = "";
@@ -147,8 +158,8 @@ public class Modelo {
                                 /*System.out.println(fnc);Escrever no arquivo*/
                                 clausula++;
                                 list.add(fnc);
-                               // fileWrite.write(fnc+"\n");
-                                
+                                // fileWrite.write(fnc+"\n");
+
                             }
                             fnc = "";
                             fnc = "-" + i + j;
@@ -171,29 +182,28 @@ public class Modelo {
                                         fnc1 = fnc1 + " " + "-" + j + l + " 0\n";
                                         clausula++;
                                         list.add(fnc1);
-                                     //  fileWrite.write(fnc1+"\n");
+                                        //  fileWrite.write(fnc1+"\n");
                                     }
 
                                 }
                                 fnc1 = "";
                             }
-    
+
                         }
                     }
                 }
-             
-                inicio=inicio+" "+variaveis+" "+clausula+"\n"; 
+
+                inicio = inicio + " " + variaveis + " " + clausula + "\n";
                 list.add(0, inicio);
             }
-           
-            
-            for(int i=0; i<list.size(); i++){
-               
+
+            for (int i = 0; i < list.size(); i++) {
+
                 this.fileWrite.write((String) list.get(i));
-                
+
             }
-               this.fileWrite.flush();
-               this.fileWrite.close();
+            this.fileWrite.flush();
+            this.fileWrite.close();
 
         } catch (IOException ex) {
             Logger.getLogger(Modelo.class.getName()).log(Level.SEVERE, null, ex);
@@ -201,4 +211,14 @@ public class Modelo {
 
     }
 
+    public int getVertices() {
+        return vertices;
+    }
+    
+    public int getMaxCor() {
+        this.MaxCor=this.vertices;
+        return MaxCor;
+    }
+    
+    
 }
